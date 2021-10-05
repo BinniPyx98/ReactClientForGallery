@@ -1,42 +1,30 @@
 /*
 Загрузка изображения. Ловим клик по кнопке Upload и запускаем функцию Upload
  */
+
+
 let inputFile = <HTMLInputElement>document.getElementById('uploadFile');
-let clickOnButtonUpload: HTMLElement = document.getElementById('uploadButton');
-let clickFilterAll:HTMLElement=document.getElementById('filterAll')
-let clickFilterMy:HTMLElement=document.getElementById('filterMy')
+let filter = "All";
+//let clickOnButtonUpload: HTMLElement = document.getElementById('uploadButton');
+//let clickFilterAll:HTMLElement=document.getElementById('filterAll')
+//let clickFilterMy:HTMLElement=document.getElementById('filterMy')
 
-if (clickFilterAll) {
-    clickFilterAll.addEventListener('click', ev => {
-        //  ev.preventDefault();
-        filter='All'
-        getGallery()
-    })
+export function handlerClickFilterAll() {
+    filter = 'All';
+    getGallery();
 }
 
-
-if (clickFilterMy) {
-    clickFilterMy.addEventListener('click', ev => {
-        //  ev.preventDefault();
-        console.log('click')
-
-        filter="My"
-        setPage("1");
-        updateURL(1);
-        getGallery()
-    })
+export function handlerClickFilterMy() {
+    filter = "My";
+    setPage("1");
+    updateURL(1);
+    getGallery();
 }
 
-let filter="All";
-
-if (clickOnButtonUpload) {
-    clickOnButtonUpload.addEventListener('click', ev => {
-        ev.preventDefault();
-        (async () => {
-            await Upload(inputFile);
-        })()
-    })
+export function clickOnButtonUpload() {
+    Upload(inputFile);
 }
+
 
 async function Upload(file: any) {
     let formData = new FormData();
@@ -48,6 +36,7 @@ async function Upload(file: any) {
     } else {
         let resolve = await fetch(`http://localhost:5400/gallery`, {
             method: 'POST',
+            // @ts-ignore
             headers: {
                 'Access-Control-Allow-Methods': 'POST',
                 'Authorization': token
@@ -67,10 +56,12 @@ async function Upload(file: any) {
  */
 export async function getGallery(): Promise<void> {
     let token = (localStorage.getItem('tokenData'));
+    // @ts-ignore
     let resolve = await fetch(getUrl(), {
         method: "GET",
+        // @ts-ignore
         headers: {
-            'Authorization': token
+            'Authorization': `Bearer ${token}`
         }
     })
 
@@ -85,41 +76,50 @@ export async function getGallery(): Promise<void> {
 }
 
 
+
+
+
+
 function createGallery(galleryObject: any): void {
-    clearGallery();
-    createImg(galleryObject);
+    console.log('create Gallery')
+  //  clearGallery();
+  //  createImg(galleryObject);
 }
 
-function createImg(galleryObject: any): void {
-    let divGallery: HTMLElement = document.getElementById('gallery');
-
-    for (let url of galleryObject.objects) {
-        let img: HTMLImageElement = document.createElement('img');
-        img.src = url;
-        divGallery.appendChild(img);
-    }
-}
+// function createImg(galleryObject: any): void {
+//     let divGallery: HTMLElement = document.getElementById('gallery');
+//
+//     for (let url of galleryObject.objects) {
+//         let img: HTMLImageElement = document.createElement('img');
+//         img.src = url;
+//         divGallery.appendChild(img);
+//     }
+// }
 
 
 /*
 Delete gallery
  */
-function clearGallery(): void {
-    let divGallery: HTMLElement = document.getElementById('gallery');
-
-    while (divGallery.firstChild) {
-        divGallery.removeChild(divGallery.firstChild);
-    }
-}
+// function clearGallery(): void {
+//     let divGallery: HTMLElement = document.getElementById('gallery');
+//
+//     while (divGallery.firstChild) {
+//         divGallery.removeChild(divGallery.firstChild);
+//     }
+// }
 
 /*
 Get function
  */
 function getPage(): string | number {
+    // @ts-ignore
+
     return localStorage.getItem('page') ? localStorage.getItem('page') : 1;
 }
 
 function getTotal(): string | number {
+    // @ts-ignore
+
     return localStorage.getItem('total') ? localStorage.getItem('total') : 1;
 }
 
@@ -132,7 +132,7 @@ function getUrl(): string {
 Update function
  */
 function updateURL(page: number): void {
-    window.history.pushState(window.location.href, null, `gallery?page=${page}`);
+    window.history.pushState(window.location.href, '', `gallery?page=${page}`);
 }
 
 
@@ -142,6 +142,7 @@ Set function
 function setPage(num: string): void {
     localStorage.setItem('page', num);
 }
+
 function setTotal(num: string): void {
     localStorage.setItem('total', num);
 }
@@ -155,11 +156,11 @@ let clickButtonNext = document.getElementById('next');
 if (clickButtonNext) {
     clickButtonNext.addEventListener('click', ev => {
         //     ev.preventDefault();
-        let total=Number(getTotal())
+        let total = Number(getTotal())
         let page: number = Number(getPage());
         //
-        console.log("total"+total)
-        console.log("page"+page)
+        console.log("total" + total)
+        console.log("page" + page)
         //
         if (page < total) {
             updateURL(page + 1);
@@ -170,8 +171,7 @@ if (clickButtonNext) {
             //         // setPage(String(total));
             //         // updateURL(page);
             //         // alert("It's last page");
-        }
-        else if(page==total) {
+        } else if (page == total) {
             //         // console.log(page)
             //         // updateURL(page + 1);
             //         // setPage(String(page + 1));
