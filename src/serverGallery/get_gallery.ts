@@ -27,6 +27,10 @@ export function clickOnButtonUpload() {
 
 
 async function Upload(file: any) {
+
+   
+
+
     let formData = new FormData();
     formData.append('img', file.files[0]);
     let token = (localStorage.getItem('tokenData'));
@@ -34,19 +38,26 @@ async function Upload(file: any) {
     if (!file) {
         console.log('not file');
     } else {
-        let resolve = await fetch(`http://localhost:5400/gallery`, {
-            method: 'POST',
+        let s3UrlForPutImage = await fetch(`testLhttp://localhost:3000/local/getS3Url`, {
+            method: 'GET',
             // @ts-ignore
             headers: {
-                'Access-Control-Allow-Methods': 'POST',
                 'Authorization': token
             },
-            body: formData
         })
-        if (resolve.status == 200) {
-            //window.location.reload()
+console.log(s3UrlForPutImage);
+        // let resolve = await fetch(`http://localhost:3000/local/upload`, {
+        //     method: 'POST',
+        //     // @ts-ignore
+        //     headers: {
+        //         'Authorization': token
+        //     },
+        //     body: formData
+        // })
+        // if (resolve.status == 200) {
+        //     //window.location.reload()
 
-        }
+        // }
     }
 }
 
@@ -124,7 +135,7 @@ function getTotal(): string | number {
 }
 
 function getUrl(): string {
-    return `http://localhost:5400/gallery?page=${getPage()}&limit=5&filter=${filter}`;
+    return `http://localhost:3000/local/gallery?page=${getPage()}&limit=5&filter=${filter}`;
 }
 
 
@@ -181,6 +192,7 @@ if (clickButtonNext) {
     })
 
 }
+
 
 /*
 Catch click button "Back"

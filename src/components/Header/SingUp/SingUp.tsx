@@ -1,67 +1,69 @@
 import React, {ChangeEvent} from 'react';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 
-type PropsType={
-    openDialogSingUp:boolean,
-    setOpenDialogSingUp:(value:boolean)=>void
+type PropsType = {
+    openDialogSingUp: boolean,
+    setOpenDialogSingUp: (value: boolean) => void
 }
 
 
-const SingUp = (props:PropsType) => {
+const SingUp = (props: PropsType) => {
 
     const [email, setEmail] = React.useState('')
     const [password, setPassword] = React.useState('')
 
 
-   function handlerSingUp(){
-       console.log('registr')
-       let validationResult: boolean = false;
-       let regexp: RegExp = /^.+@.+\..+$/igm;
-       let regexpPass: RegExp = /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,}$/;
-       let userPassword: string | void = password;
-       let userEmail: string | void = email;
+    function handlerSingUp() {
+        console.log('registr')
+        let validationResult: boolean = false;
+        let regexp: RegExp = /^.+@.+\..+$/igm;
+        let regexpPass: RegExp = /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,}$/;
+        let userPassword: string | void = password;
+        let userEmail: string | void = email;
 
 
-       if (userPassword && userEmail) {
-           if (regexp.test(userEmail) && regexpPass.test(userPassword)) {
-               validationResult = true;
-               sendNewUser(userEmail,userPassword)
-           } else {
-               alert('некорректные данные')
-           }
-       }
-       if (validationResult) {
+        if (userPassword && userEmail) {
+            if (regexp.test(userEmail) && regexpPass.test(userPassword)) {
+                validationResult = true;
+                sendNewUser(userEmail, userPassword)
+                handlerClose();
+            } else {
+                alert('некорректные данные')
+            }
+        }
+        if (validationResult) {
 
-       }
-   }
+        }
+    }
+
+
     async function sendNewUser(userEmail: string, userPassword: string) {
 
         let userJsonDate: any = JSON.stringify({
             email: userEmail,
             password: userPassword
-        })
+        })  
 
-        let resolve = await fetch('http://localhost:5400/registration', {
+        fetch('https://xo2w7jv6a5.execute-api.us-east-1.amazonaws.com/prod/registration', {
             method: 'POST',
             headers: {
-                'Access-Control-Allow-Methods': 'POST',
                 "Content-Type": "application/json"
             },
             body: userJsonDate
         })
 
-        return resolve
     }
 
 
-    function handlerOpenSinUpDialog(){
+    function handlerOpenSinUpDialog() {
         props.setOpenDialogSingUp(true);
     }
 
 
-    function handlerClose(){
+    function handlerClose() {
         props.setOpenDialogSingUp(false);
     }
+
 
     const handlerEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
         setEmail(e.currentTarget.value)
@@ -72,11 +74,8 @@ const SingUp = (props:PropsType) => {
     }
 
 
-
-
     return (
         <div>
-            <Button variant={'contained'} color={"secondary"} onClick={handlerOpenSinUpDialog}>Sing Up</Button>
 
             <Dialog open={props.openDialogSingUp} onClose={handlerClose} aria-labelledby={'Sing In'}>
                 <DialogTitle id={"Sing Up"}>Sin Up</DialogTitle>

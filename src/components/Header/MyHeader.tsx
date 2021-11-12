@@ -6,8 +6,11 @@ import {
     Container, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
     Toolbar
 } from "@material-ui/core";
-import DialogSingIn from "../DialogSingIn/DialogSingIn";
+
+import DialogSingIn from "./DialogSingIn/DialogSingIn";
 import SingUp from "./SingUp/SingUp";
+import SearchField from "./SearchField/SearchField";
+
 
 type PropsType = {
     setImage: (value: Array<string>) => void,
@@ -18,14 +21,14 @@ type PropsType = {
 
 const MyHeader = (props: PropsType) => {
     let input = useRef(null)
-    const [open, setOpen] = React.useState(false)
     const [email, setEmail] = React.useState('')
     const [password, setPassword] = React.useState('')
-    const [uploadDialogOpen, setUploadDialogOpen] = React.useState(false)
-    const [openDialogSingUp, setOpenDialogSingUp] = React.useState(false)
+    const [show_SingIn_Dialog, setShow_SingIn_Dialog] = React.useState(false)
+    const [show_upload_Dialog, setShow_upload_Dialog] = React.useState(false)
+    const [show_SingUp_Dialog, setShow_SingUp_Dialog] = React.useState(false)
 
     function handlerUploadClose() {
-        setUploadDialogOpen(false);
+        setShow_upload_Dialog(false);
     }
 
     function setPage(num: string): void {
@@ -45,7 +48,7 @@ const MyHeader = (props: PropsType) => {
     }
 
     function handlerOpenDialogUpload() {
-        setUploadDialogOpen(true)
+        setShow_upload_Dialog(true)
     }
 
     function clickOnButtonUpload() {
@@ -59,32 +62,55 @@ const MyHeader = (props: PropsType) => {
         let formData = new FormData();
         formData.append('img', file.files[0]);
         let token = (localStorage.getItem('tokenData'));
-
+console.log(JSON.stringify(file.files[0].name));
+const metadata= {
+    filename: file.files[0].name,
+    contentType: file.files[0].type,
+    size: file.files[0].size
+}
         if (!file) {
             console.log('not file');
         } else {
-            let resolve = await fetch(`http://localhost:5400/gallery`, {
-                method: 'POST',
+            let s3UrlForPutImage = await fetch(`https://xo2w7jv6a5.execute-api.us-east-1.amazonaws.com/prod/getS3Url`, {
+            method: 'POST',
+            // @ts-ignore
+            headers: {
+                'Content-Type': 'text/html',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(metadata),
+        })
+        let JsonS3UrlForPutImage =  await s3UrlForPutImage.json();
+        console.log(JsonS3UrlForPutImage);
+
+        let bodyResolve = JsonS3UrlForPutImage.split('?')[0];
+console.log(bodyResolve);   
+
+            let resolve = await fetch(`${bodyResolve}`, {
+                method: 'PUT',
                 // @ts-ignore
                 headers: {
-                    'Access-Control-Allow-Methods': 'POST',
-                    'Authorization': `Bearer ${token}`
+                  //  'Content-Type' : `${file.files[0].type}`
+                    // 'Access-Control-Allow-Methods': 'POST',
+                    // 'Authorization': `Bearer ${token}`
                 },
-                body: formData
+                body: file.files[0]
             })
             if (resolve.status === 200) {
                 //window.location.reload()
 
             }
-        }
+         }
     }
 
     function updateURL(page: number): void {
         window.history.pushState(window.location.href, "", `gallery?page=${page}`);
     }
-
+    function handlerOpenSinUpDialog() {
+        setShow_SingUp_Dialog(true);
+    }
     const handlerSingIn = () => {
-        setOpen(true)
+        setShow_SingIn_Dialog(true);
     }
 
 
@@ -95,12 +121,14 @@ const MyHeader = (props: PropsType) => {
                     <Box mr={3}>
                         <Button variant={'outlined'} color={"inherit"} onClick={handlerSingIn}>Sing In</Button>
 
-                        <DialogSingIn open={open} setOpen={setOpen} setEmail={setEmail} setPassword={setPassword}
+                        { show_SingIn_Dialog && <DialogSingIn open={show_SingIn_Dialog} setOpen={setShow_SingIn_Dialog} setEmail={setEmail} setPassword={setPassword}
                                       email={email} password={password} setImage={props.setImage}
-                                      getGallery={props.getGallery}/>
+                                      getGallery={props.getGallery}/>}
 
                     </Box>
-                    <SingUp openDialogSingUp={openDialogSingUp} setOpenDialogSingUp={setOpenDialogSingUp}/>
+                    <Button variant={'contained'} color={"secondary"} onClick={handlerOpenSinUpDialog}>Sing Up</Button>
+
+                    { show_SingUp_Dialog && <SingUp openDialogSingUp={show_SingUp_Dialog} setOpenDialogSingUp={setShow_SingUp_Dialog}/>}
                     <Button variant={'contained'} color={"secondary"} onClick={handlerClickFilterAll}>Filter
                         All</Button>
                     <Button variant={'contained'} color={"secondary"} onClick={handlerClickFilterMy}>Filter
@@ -110,20 +138,21 @@ const MyHeader = (props: PropsType) => {
                         <Button variant={'contained'} color={"secondary"}
                                 onClick={handlerOpenDialogUpload}>Upload</Button>
 
-                        <Dialog open={uploadDialogOpen} onClose={handlerUploadClose} aria-labelledby={'Sing In'}>
-                            <DialogTitle id={"Sing In"}>Sin In</DialogTitle>
+                        <Dialog open={show_upload_Dialog} onClose={handlerUploadClose} aria-labelledby={'Sing In'}>
+                            <DialogTitle id={"Sing In"}>Upload</DialogTitle>
                             <DialogContent>
                                 Upload: <input type="file" id="uploadFile" name="uploadFile" ref={input}/>
 
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={handlerUploadClose} color={"primary"}>Cancel</Button>
-                                <Button onClick={clickOnButtonUpload} color={"primary"}>Log In</Button>
+                                <Button onClick={clickOnButtonUpload} color={"primary"}>Upload</Button>
                             </DialogActions>
                         </Dialog>
                     </Box>
-
+                <SearchField setImage={props.setImage}/>
                 </Toolbar>
+
             </Container>
         </AppBar>
 

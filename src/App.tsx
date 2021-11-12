@@ -29,8 +29,14 @@ function App() {
         if (data) {
             galleryObject = data;
         }
-        setTotal(galleryObject.total);
-        setImage(galleryObject.objects)
+        console.log('galleryObject= ' + JSON.stringify(galleryObject));
+        setTotal(galleryObject.input.total);
+        if(!galleryObject.input?.objects){
+            setImage(['']);
+        }else{
+            setImage(galleryObject.input.objects);
+        }
+    
     }
 
 
@@ -52,7 +58,7 @@ function App() {
     }
 
     function getUrl(): string {
-        return `http://localhost:5400/gallery?page=${getPage()}&limit=5&filter=${filter}`;
+        return `https://xo2w7jv6a5.execute-api.us-east-1.amazonaws.com/prod/gallery?page=${getPage()}&limit=5&filter=${filter}`;
     }
 
 

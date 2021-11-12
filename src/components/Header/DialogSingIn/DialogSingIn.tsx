@@ -24,7 +24,7 @@ Main function for authorization.Run after click
         if (result) {
             DialogSingInClose();
             await props.getGallery();
-            setTimeout(reset_gallery, 60000);
+            setTimeout(reset_gallery, 60000000);
         }
     }
 
@@ -68,10 +68,11 @@ Main function for authorization.Run after click
 
         let resolve = await sendAuthData(userEmail, userPassword);
         let token = await resolve.json();
+        console.log(token)
         if (resolve.status === 200) {
 
-            let result: string = token;
-            save_token(result);
+            //let result: string = token;
+            save_token(token);
 
             return true
         } else {
@@ -88,15 +89,16 @@ Main function for authorization.Run after click
             password: userPassword
         })
 
-        let resolve = await fetch('http://localhost:5400/auth', {
+        let resolve = await fetch('https://xo2w7jv6a5.execute-api.us-east-1.amazonaws.com/prod/auth', {
             method: 'POST',
             headers: {
-                'Access-Control-Allow-Methods': 'POST',
                 "Content-Type": "application/json"
             },
             body: userJsonDate
         })
-
+//         let test =await resolve.json();
+//         let JSONTest = test;
+// console.log('token in sendAuthData = ' + JSONTest.token);
         return resolve
     }
 

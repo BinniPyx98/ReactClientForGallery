@@ -1,5 +1,8 @@
 import React from 'react';
 import {Box, Button, Card, CardMedia, Container, Grid} from "@material-ui/core";
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import MainCss from './MainArea.module.css'
+import IconButton from '@mui/material/IconButton';
 
 type PropsType = {
     image: Array<string>,
@@ -7,6 +10,9 @@ type PropsType = {
 }
 
 const MainArea = (props: PropsType) => {
+
+    const likesPhotos: Array<string> = [];
+
     function setPage(num: string): void {
         localStorage.setItem('page', num);
     }
@@ -78,15 +84,25 @@ const MainArea = (props: PropsType) => {
 
     }
 
+    function mouseLeaveHandler () {
+        console.log('leave');
+    }
+    function mouseEnterHandler () {
+        console.log('mouse enter');
+    }
+
 
     let images = props.image.map(item => {
 
         return (
             <Grid item xs={12} sm={6} md={4}>
-                <Card>
+                <Card className={MainCss.position}>
                     <CardMedia
+                        onMouseLeave={mouseLeaveHandler}
+                        onMouseEnter={mouseEnterHandler}
                         image={`${item}`}
-                        style={{paddingTop: "56.25%"}}/>
+                        style={{paddingTop: "56.25%"}} />
+                        <div className={MainCss.favoriteLike}> <IconButton size="large" aria-label="search" color="inherit"><FavoriteBorderIcon/></IconButton></div>
                 </Card>
             </Grid>
         )
